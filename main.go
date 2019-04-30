@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func panicOnErr(err error) {
@@ -13,15 +15,21 @@ func panicOnErr(err error) {
 }
 
 const pdfExt = ".pdf"
+const txtExt = ".txt"
 
 func main() {
 	path := "."
 	if len(os.Args) != 2 {
-		fmt.Println("./pdf2text {path}")
+		fmt.Println("./pdf2text {srcDir} {dstDir}")
+		return
 	}
 	path = os.Args[1]
+	dstDir := os.Args[2]
 
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	err := os.MkdirAll(dstDir, os.ModePerm)
+	panicOnErr(err)
+
+	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -31,9 +39,14 @@ func main() {
 		}
 
 		if filepath.Ext(path) == pdfExt {
-			fmt.Println(path)
+			fmt.Printf("found %s\n", path)
 		}
 
+		_, file := filepath.Split(path)
+		dstPath := filepath.Join(dstDir, strings.Trim(file, pdfExt)+txtExt)
+
+		out, _ := exec.Command("pdftotext", path, dstPath).CombinedOutput()
+		fmt.Printf("%s\n", out)
 		return nil
 	})
 
