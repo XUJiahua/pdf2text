@@ -19,7 +19,7 @@ const txtExt = ".txt"
 
 func main() {
 	path := "."
-	if len(os.Args) != 2 {
+	if len(os.Args) != 3 {
 		fmt.Println("./pdf2text {srcDir} {dstDir}")
 		return
 	}
