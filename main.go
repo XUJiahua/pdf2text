@@ -38,13 +38,15 @@ func main() {
 			return nil
 		}
 
-		if filepath.Ext(path) == pdfExt {
-			fmt.Printf("found %s\n", path)
+		if filepath.Ext(path) != pdfExt {
+			return nil
 		}
+		fmt.Printf("found %s\n", path)
 
 		_, file := filepath.Split(path)
 		dstPath := filepath.Join(dstDir, strings.Trim(file, pdfExt)+txtExt)
 
+		fmt.Println("pdftotext", path, dstPath)
 		out, _ := exec.Command("pdftotext", path, dstPath).CombinedOutput()
 		fmt.Printf("%s\n", out)
 		return nil
